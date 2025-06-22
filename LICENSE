@@ -1,3 +1,8 @@
+
+**English:** This repository contains game code licensed under AGPL v3 and a music file for immediate page playback only. The AGPL v3 license applies **ONLY** to the game code (HTML, CSS, JavaScript). The included music file (`bgm.mp3`) is provided solely for immediate playback within this web page and has no redistribution rights.
+
+**中文：** 此仓库包含采用AGPL v3许可的游戏代码和仅用于页面即时播放的音乐文件。AGPL v3许可证**仅**适用于游戏代码（HTML、CSS、JavaScript）。包含的音乐文件(`bgm.mp3`)仅供在此网页内即时播放使用，没有重新分发权利。
+
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
 
