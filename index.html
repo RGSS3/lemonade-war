@@ -1058,10 +1058,10 @@
                 buildingTypes.push(i);
             }
             
-            const totalTypes = buildingTypes.length;
-            const isCompact = totalTypes > 10;
+            // Only show the last 10 building types
+            const displayTypes = buildingTypes.slice(-10);
             
-            buildingTypes.forEach((i, index) => {
+            displayTypes.forEach((i) => {
                 const count = buildings[i];
                 const config = gameConfig.buildings[i];
                 const dps = count * config.baseIncome;
@@ -1069,26 +1069,14 @@
                 const emoji = buildingName.split(' ')[0]; // Extract emoji part
                 
                 const buildingDiv = document.createElement('div');
-                if (isCompact) {
-                    // Compact display - all buildings in one line format
-                    buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
-                    buildingDiv.innerHTML = `
-                        <div class="flex items-center justify-center text-xs">
-                            <span class="text-sm mr-1">${emoji}</span>
-                            <div class="font-bold text-primary text-xs">${count}</div>
-                        </div>
-                    `;
-                } else {
-                    // Full display with DPS
-                    buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
-                    buildingDiv.innerHTML = `
-                        <div class="flex flex-col items-center text-xs leading-tight">
-                            <span class="text-sm">${emoji}</span>
-                            <div class="font-bold text-primary text-xs">${count}</div>
-                            <div class="text-gray-500 dark:text-gray-400 text-xs">${formatNumber(dps)}/s</div>
-                        </div>
-                    `;
-                }
+                buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-2 py-1 text-center border min-w-0 flex-shrink-0';
+                buildingDiv.innerHTML = `
+                    <div class="flex items-center justify-center text-xs whitespace-nowrap">
+                        <span class="text-sm mr-1">${emoji}</span>
+                        <div class="font-bold text-primary text-xs mr-1">${count}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-xs">(${formatNumber(dps)}/s)</div>
+                    </div>
+                `;
                 container.appendChild(buildingDiv);
             });
         }
