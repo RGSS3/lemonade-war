@@ -142,7 +142,7 @@
             </div>
 
             <!-- Player Section (Bottom) -->
-            <div class="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div class="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg p-3">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
@@ -1068,11 +1068,17 @@
                 const buildingName = t('buildings')[i];
                 const emoji = buildingName.split(' ')[0]; // Extract emoji part
                 
-                // Show full info only for the last building when compact, or all buildings when not compact
-                const showFullInfo = !isCompact || index === totalTypes - 1;
-                
                 const buildingDiv = document.createElement('div');
-                if (showFullInfo) {
+                if (isCompact) {
+                    // Compact display - all buildings in one line format
+                    buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
+                    buildingDiv.innerHTML = `
+                        <div class="flex items-center justify-center text-xs">
+                            <span class="text-sm mr-1">${emoji}</span>
+                            <div class="font-bold text-primary text-xs">${count}</div>
+                        </div>
+                    `;
+                } else {
                     // Full display with DPS
                     buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
                     buildingDiv.innerHTML = `
@@ -1080,15 +1086,6 @@
                             <span class="text-sm">${emoji}</span>
                             <div class="font-bold text-primary text-xs">${count}</div>
                             <div class="text-gray-500 dark:text-gray-400 text-xs">${formatNumber(dps)}/s</div>
-                        </div>
-                    `;
-                } else {
-                    // Compact display - only emoji and count in one line
-                    buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
-                    buildingDiv.innerHTML = `
-                        <div class="flex items-center justify-center text-xs">
-                            <span class="text-sm mr-1">${emoji}</span>
-                            <div class="font-bold text-primary text-xs">${count}</div>
                         </div>
                     `;
                 }
