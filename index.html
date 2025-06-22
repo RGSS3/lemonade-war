@@ -1,124 +1,1818 @@
-# 🍋 Lemonade Inflation Wars / 柠檬通胀大战
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemonade Inflation Wars</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                        lemon: '#FFD700',
+                        success: '#10B981',
+                        danger: '#EF4444'
+                    }
+                }
+            },
+            darkMode: 'class'
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors select-none">
+    <!-- Game Container -->
+    <div class="min-h-screen flex flex-col">
+        <!-- Header Controls -->
+        <div class="bg-gray-50 dark:bg-gray-800 p-4 shadow-md">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-2">
+                    <h1 class="text-2xl font-bold text-primary">🍋 <span id="gameTitle">Lemonade Inflation Wars</span></h1>
+                    
+                    <!-- Control Buttons -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="roundDuration" class="px-3 py-1 rounded bg-white dark:bg-gray-700 border text-base select-none">
+                            <!-- Options will be populated dynamically based on game progress -->
+                        </select>
+                        
+                        <button id="pauseBtn" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded font-medium select-none">
+                            ⏸️ <span id="pauseText">Pause</span>
+                        </button>
+                        
+                        <button id="fastForwardBtn" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded font-medium select-none">
+                            ⏭️ <span id="fastForwardText">Fast Forward</span>
+                        </button>
+                        
+                        <button id="restartBtn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded font-medium select-none">
+                            🔄 <span id="restartText">Restart</span>
+                        </button>
+                        
+                        <button id="easyStartBtn" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded font-medium select-none">
+                            🚀 <span id="easyStartText">Easy Start</span>
+                        </button>
+                        
+                        <button id="bgmBtn" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded font-medium select-none">
+                            🔇 <span id="bgmText">BGM</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Time Display Row -->
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-3">
+                        <div id="timer" class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded font-mono">
+                            10.0s
+                        </div>
+                        
+                        <div class="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">
+                            <div>Real: <span id="realTime" class="font-mono">0:00</span></div>
+                            <div>Game: <span id="gameTime" class="font-mono">0d 0:00</span></div>
+                        </div>
+                        
+                        <div class="text-xs bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
+                            <div class="text-amber-700 dark:text-amber-300" id="timeScaleText">Time Scale: 1 real second = 1 game second</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Language Selector on separate line -->
+                <div class="flex justify-end">
+                    <select id="languageSelect" class="px-3 py-1 rounded bg-white dark:bg-gray-700 border text-base">
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-A strategic idle game where you compete against AI in an inflationary economy, exploring themes of capitalism, stagflation, and economic cycles.
+        <!-- Main Game Area -->
+        <div class="flex-1 max-w-6xl mx-auto w-full p-4">
+            <!-- AI Section (Top) -->
+            <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            🤖
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-red-700 dark:text-red-300" id="aiName">Aggressive Bot</h2>
+                            <p class="text-sm text-red-600 dark:text-red-400" id="aiPersonality">Always buys the most expensive available</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-red-700 dark:text-red-300">
+                            💰 <span id="aiMoney">0</span>G
+                        </div>
+                        <div class="text-lg text-red-600 dark:text-red-400">
+                            📈 <span id="aiIncome">0</span>G/s
+                        </div>
+                        <div class="text-sm text-red-500 dark:text-red-400">
+                            🏦 <span id="aiAssets">0</span>G <span id="aiAssetsLabel">assets</span>
+                        </div>
+                        <div class="text-xs text-red-400 dark:text-red-500">
+                            ⏰ Next buy: <span id="aiCountdown">∞</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- AI Buildings Display -->
+                <div class="flex flex-wrap gap-1" id="aiBuildingsDisplay">
+                    <!-- Buildings will be populated here -->
+                </div>
+            </div>
 
-一款策略放置游戏，在通胀经济中与AI竞争，探索资本主义、滞胀和经济周期的主题。
+            <!-- Shared Purchasing Area (Middle) -->
+            <div class="bg-lemon/10 dark:bg-yellow-900/20 border-2 border-lemon dark:border-yellow-700 rounded-lg p-4 mb-4">
+                <h3 class="text-xl font-bold mb-4 text-center">🏪 <span id="marketTitle">Shared Lemonade Market</span></h3>
+                
 
-## 🎮 Gameplay / 游戏玩法
+                
+                <div class="max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+                    <div id="buildingsMarket">
+                        <!-- Buildings will be populated here by sections -->
+                    </div>
+                </div>
+            </div>
 
-### English
+            <!-- Player Section (Bottom) -->
+            <div class="bg-green-50 dark:bg-green-900/20 border-2 border-green-200 dark:border-green-800 rounded-lg p-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            👤
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-green-700 dark:text-green-300" id="playerName">You</h2>
+                            <p class="text-sm text-green-600 dark:text-green-400" id="playerLabel">Human Player</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-green-700 dark:text-green-300">
+                            💰 <span id="playerMoney">10</span>G
+                        </div>
+                        <div class="text-lg text-green-600 dark:text-green-400">
+                            📈 <span id="playerIncome">0</span>G/s
+                        </div>
+                        <div class="text-sm text-green-500 dark:text-green-400">
+                            🏦 <span id="playerAssets">10</span>G <span id="playerAssetsLabel">assets</span>
+                        </div>
+                        <div class="text-xs text-green-400 dark:text-green-500">
+                            ⏰ Next buy: <span id="playerCountdown">∞</span>
+                        </div>
+                    </div>
+                </div>
 
-**Core Mechanics:**
-- **Shared Market**: You and the AI compete for the same buildings in a shared marketplace
-- **Inflation System**: Every purchase increases the cost for everyone - timing is everything
-- **Stagflation Detection**: If buying the cheapest building takes over 365 days, you're in stagflation
-- **AI Replacement**: When AI hits stagflation, it gets replaced with a new competitor
-- **Time Dilation**: Accelerate time from seconds to cosmic eras as your empire grows
-- **8 Thematic Eras**: Progress through different civilizations, from basic lemonade stands to SCP containment facilities
+                <!-- Manual Click Button and Bulk Purchase Controls -->
+                <div class="text-center mb-4">
+                    <div class="flex flex-wrap items-center justify-center gap-3">
+                        <button id="manualClickBtn" class="px-6 py-3 bg-primary hover:bg-primary/80 text-white rounded-lg font-bold text-lg transition-transform active:scale-95 select-none">
+                            🍋 <span id="clickText">Squeeze Lemon (+1G)</span>
+                        </button>
+                        <div class="flex gap-2">
+                            <button id="bulkBtn1" class="px-3 py-2 bg-primary hover:bg-primary/80 text-white rounded text-sm font-medium select-none">×1</button>
+                            <button id="bulkBtn10" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm font-medium select-none">×10</button>
+                            <button id="bulkBtn25" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm font-medium select-none">×25</button>
+                            <button id="bulkBtn100" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm font-medium select-none">×100</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Player Buildings Display -->
+                <div class="flex flex-wrap gap-1" id="playerBuildingsDisplay">
+                    <!-- Buildings will be populated here -->
+                </div>
+            </div>
+        </div>
 
-**Strategy Elements:**
-- **Economic Warfare**: Buy expensive buildings to price out your competitor
-- **Resource Management**: Balance immediate purchases vs. long-term income
-- **Market Timing**: Strike when your opponent is weak, defend when you're vulnerable
-- **Bulk Purchasing**: Buy multiple buildings at once for efficiency
-- **Era Progression**: Unlock new themes and time scales as you advance
+        <!-- BGM Audio -->
+        <audio id="bgmAudio" loop preload="auto">
+            <source src="bgm.mp3" type="audio/mpeg">
+            <!-- Fallback message for browsers that don't support audio -->
+        </audio>
 
-**Victory Conditions:**
-- Survive longer than the AI without hitting stagflation
-- Accumulate the largest asset value
-- Successfully navigate through all 8 eras of civilization
+        <!-- Status Messages -->
+        <div id="statusMessages" class="fixed bottom-4 right-4 space-y-2 z-50">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
 
-### 中文
+    <script>
+        // ===== INTERNATIONALIZATION =====
+        const i18n = {
+            en: {
+                // Game UI
+                pause: "⏸️ Pause",
+                resume: "▶️ Resume", 
+                fastForward: "⏭️ Skip to Next",
+                manualClick: "🍋 Squeeze Lemon (+1G)",
+                
+                // Buildings
+                buildings: [
+                    "Manual Click",
+                    // Section 1: Basic Lemonade Business (1-8)
+                    "🧒 Scout Helper", 
+                    "🏪 Lemon Stand",
+                    "🏭 Juice Factory",
+                    "⛏️ Lemon Mine",
+                    "🌳 Lemon Plantation", 
+                    "🏢 Lemon Corporation",
+                    "🌀 Interdimensional Portal",
+                    "🌌 Quantum Lemon Engine",
+                    // Section 2: Alice in Wonderland + Lemon (9-16)
+                    "🐰 White Rabbit's Lemon Watch",
+                    "🍄 Mad Hatter's Lemon Tea Party",
+                    "🌹 Queen of Hearts' Lemon Tarts",
+                    "🃏 Cheshire Cat's Lemon Grin",
+                    "🎩 Alice's Lemon Wonderland",
+                    "♠️ Card Soldiers' Lemon March",
+                    "🐛 Caterpillar's Lemon Hookah",
+                    "🏰 Duchess's Lemon Croquet",
+                    // Section 3: Age of Exploration + Lemon (17-24)
+                    "⛵ Columbus's Lemon Ships",
+                    "🗺️ Magellan's Citrus Route",
+                    "🏴‍☠️ Pirate Lemon Treasure",
+                    "🧭 Navigator's Lemon Compass",
+                    "🏝️ New World Lemon Colonies",
+                    "⚓ Maritime Lemon Trading Post",
+                    "🎯 Conquistador's Lemon Gold",
+                    "🌍 Global Lemon Empire",
+                    // Section 4: Touhou Project + Lemon (25-32)
+                    "🌸 Reimu's Lemon Shrine",
+                    "⭐ Marisa's Lemon Magic",
+                    "🎭 Yukari's Lemon Gaps",
+                    "❄️ Cirno's Frozen Lemonade",
+                    "🌙 Kaguya's Lunar Lemons",
+                    "🔥 Mokou's Phoenix Lemon",
+                    "⚡ Remilia's Vampire Lemonade", 
+                    "🌺 Yuyuko's Ghost Lemon Garden",
+                    // Section 5: DND + Lemon (33-40)
+                    "🎲 D20 Lemon Dice of Fortune",
+                    "🧙 Archmage's Citrus Spellbook",
+                    "🐉 Ancient Lemon Dragon Hoard",
+                    "🏰 Dungeon of Eternal Lemonades",
+                    "⚔️ Legendary Lemon Blade +5",
+                    "🔮 Crystal Ball of Lemon Visions",
+                    "👑 Crown of the Lemon Lich King",
+                    "🌟 Epic Lemon Artifact of Power",
+                    // Section 6: Industrial Revolution + Lemon (41-48)
+                    "🚂 Steam-Powered Lemon Express",
+                    "🏭 Citrus Mass Production Factory",
+                    "⚙️ Mechanical Lemon Harvester",
+                    "🔥 Coal-Fired Lemon Steamworks",
+                    "🧵 Lemon Oil Textile Mills",
+                    "💡 Edison's Lemon Light Bulb Co.",
+                    "📡 Telegraph Lemon Network",
+                    "🌍 Global Lemon Industrial Empire",
+                    // Section 7: SCP Foundation + Lemon (49-56)
+                    "🔒 SCP-173: Lemon Sculpture",
+                    "⚠️ Keter-Class Lemon Anomaly",
+                    "🔬 Dr. Bright's Lemon Research",
+                    "🏢 Site-19 Lemon Containment",
+                    "👨‍🔬 O5 Council Lemon Directive",
+                    "🌐 Global Lemon Protection Agency",
+                    "⭕ SCP-999: Friendly Lemon Blob",
+                    "🛡️ Foundation Lemon Reality Anchor",
+                    // Section 8: Primitive Era + Lemon (57-64)
+                    "🪨 Stone Age Lemon Crushers",
+                    "🔥 Discovery of Lemon Fire",
+                    "🏘️ Tribal Lemon Gatherers",
+                    "🏹 Hunter's Lemon Arrows",
+                    "🌾 Agricultural Lemon Revolution",
+                    "📜 First Lemon Hieroglyphs",
+                    "⚱️ Bronze Age Lemon Tools",
+                    "🔄 Civilization Lemon Restart"
+                ],
+                
+                // AI Personalities
+                aiPersonalities: {
+                    aggressive: {
+                        name: "Aggressive Bot",
+                        description: "Always buys the most expensive available"
+                    },
+                    balanced: {
+                        name: "Balanced Bot", 
+                        description: "Focuses on cost efficiency"
+                    },
+                    greedy: {
+                        name: "Greedy Bot",
+                        description: "Prioritizes immediate income"
+                    }
+                },
+                
+                // Status Messages
+                cantAfford: "Not enough money!",
+                stagflation: "Stagflation detected!",
+                aiReplaced: "AI replaced due to stagflation",
+                gameRestart: "Game restarted",
+                easyStart: "Easy Start (1000G)"
+            },
+            
+            zh: {
+                // Game UI  
+                pause: "⏸️ 暂停",
+                resume: "▶️ 继续",
+                fastForward: "⏭️ 跳到下回合", 
+                manualClick: "🍋 榨柠檬 (+1G)",
+                
+                // Buildings
+                buildings: [
+                    "手工点击",
+                    // Section 1: Basic Lemonade Business (1-8)
+                    "🧒 童子军助手",
+                    "🏪 柠檬小摊", 
+                    "🏭 榨汁工厂",
+                    "⛏️ 柠檬原液矿",
+                    "🌳 柠檬种植园",
+                    "🏢 柠檬垄断集团", 
+                    "🌀 跨维柠檬门户",
+                    "🌌 量子柠檬引擎",
+                    // Section 2: Alice in Wonderland + Lemon (9-16)
+                    "🐰 白兔的柠檬怀表",
+                    "🍄 疯帽匠的柠檬茶会",
+                    "🌹 红心女王的柠檬挞",
+                    "🃏 柴郡猫的柠檬笑容",
+                    "🎩 爱丽丝的柠檬仙境",
+                    "♠️ 扑克兵的柠檬行军",
+                    "🐛 毛毛虫的柠檬水烟",
+                    "🏰 公爵夫人的柠檬槌球",
+                    // Section 3: Age of Exploration + Lemon (17-24)
+                    "⛵ 哥伦布的柠檬船队",
+                    "🗺️ 麦哲伦的柑橘航线",
+                    "🏴‍☠️ 海盗柠檬宝藏",
+                    "🧭 航海者的柠檬指南针",
+                    "🏝️ 新大陆柠檬殖民地",
+                    "⚓ 海上柠檬贸易站",
+                    "🎯 征服者的柠檬黄金",
+                    "🌍 全球柠檬帝国",
+                    // Section 4: Touhou Project + Lemon (25-32)
+                    "🌸 灵梦的柠檬神社",
+                    "⭐ 魔理沙的柠檬魔法",
+                    "🎭 紫的柠檬隙间",
+                    "❄️ 琪露诺的冷冻柠檬水",
+                    "🌙 辉夜的月球柠檬",
+                    "🔥 妹红的不死鸟柠檬",
+                    "⚡ 蕾米的吸血鬼柠檬水",
+                    "🌺 幽幽子的幽灵柠檬园",
+                    // Section 5: DND + Lemon (33-40)
+                    "🎲 D20命运柠檬骰",
+                    "🧙 大法师的柑橘法术书",
+                    "🐉 上古柠檬龙宝库",
+                    "🏰 永恒柠檬水地下城",
+                    "⚔️ 传奇柠檬之刃 +5",
+                    "🔮 柠檬预言水晶球",
+                    "👑 柠檬巫妖王之冠",
+                    "🌟 史诗柠檬神器",
+                    // Section 6: Industrial Revolution + Lemon (41-48)
+                    "🚂 蒸汽柠檬快车",
+                    "🏭 柑橘大规模生产工厂",
+                    "⚙️ 机械柠檬收割机",
+                    "🔥 燃煤柠檬蒸汽厂",
+                    "🧵 柠檬油纺织厂",
+                    "💡 爱迪生柠檬灯泡公司",
+                    "📡 电报柠檬网络",
+                    "🌍 全球柠檬工业帝国",
+                    // Section 7: SCP Foundation + Lemon (49-56)
+                    "🔒 SCP-173：柠檬雕塑",
+                    "⚠️ Keter级柠檬异常",
+                    "🔬 Bright博士的柠檬研究",
+                    "🏢 Site-19柠檬收容所",
+                    "👨‍🔬 O5议会柠檬指令",
+                    "🌐 全球柠檬保护局",
+                    "⭕ SCP-999：友善柠檬球",
+                    "🛡️ 基金会柠檬现实锚",
+                    // Section 8: Primitive Era + Lemon (57-64)
+                    "🪨 石器时代柠檬粉碎机",
+                    "🔥 柠檬火焰的发现",
+                    "🏘️ 部落柠檬采集者",
+                    "🏹 猎人的柠檬箭矢",
+                    "🌾 农业柠檬革命",
+                    "📜 最初的柠檬象形文字",
+                    "⚱️ 青铜时代柠檬工具",
+                    "🔄 文明柠檬重启"
+                ],
+                
+                // AI Personalities
+                aiPersonalities: {
+                    aggressive: {
+                        name: "激进机器人",
+                        description: "总是购买最贵的可用物品"
+                    },
+                    balanced: {
+                        name: "平衡机器人",
+                        description: "注重性价比"  
+                    },
+                    greedy: {
+                        name: "贪婪机器人",
+                        description: "优先考虑即时收入"
+                    }
+                },
+                
+                // Status Messages
+                cantAfford: "钱不够！",
+                stagflation: "检测到滞涨！", 
+                aiReplaced: "AI因滞涨被替换",
+                gameRestart: "游戏重新开始",
+                easyStart: "简易开始 (1000G)"
+            }
+        };
 
-**核心机制：**
-- **共享市场**：你和AI在同一个市场中竞争相同的建筑
-- **通胀系统**：每次购买都会为所有人提高成本——时机就是一切
-- **滞胀检测**：如果购买最便宜建筑需要超过365天，你就陷入了滞胀
-- **AI替换**：当AI陷入滞胀时，会被新的竞争对手替换
-- **时间膨胀**：随着帝国发展，将时间从秒加速到宇宙纪元
-- **8个主题时代**：从基础柠檬摊到SCP收容设施，体验不同文明进程
+        // Detect browser language and set initial language
+        function detectBrowserLanguage() {
+            // Get browser language
+            const browserLang = navigator.language || navigator.userLanguage || navigator.browserLanguage || navigator.systemLanguage;
+            
+            // Check if it's Chinese (any variant)
+            if (browserLang && (browserLang.startsWith('zh') || browserLang.startsWith('cn'))) {
+                return 'zh';
+            } else if (browserLang && browserLang.startsWith('en')) {
+                return 'en';
+            } else {
+                // Default to Chinese if can't detect or unknown language
+                return 'zh';
+            }
+        }
 
-**策略要素：**
-- **经济战争**：购买昂贵建筑来挤出竞争对手
-- **资源管理**：平衡即时购买与长期收入
-- **市场时机**：在对手虚弱时出击，在自己脆弱时防守
-- **批量购买**：一次购买多个建筑提高效率
-- **时代进程**：随着进步解锁新主题和时间尺度
+        let currentLang = detectBrowserLanguage();
+        
+        function t(key) {
+            const keys = key.split('.');
+            let value = i18n[currentLang];
+            for (const k of keys) {
+                value = value?.[k];
+            }
+            return value || key;
+        }
 
-**胜利条件：**
-- 比AI存活更久而不陷入滞胀
-- 积累最大的资产价值
-- 成功穿越文明的全部8个时代
+        // ===== GAME CONFIGURATION =====
+        const gameConfig = {
+            buildings: [
+                // Manual click placeholder
+                { baseIncome: 0, baseCost: 0, costMultiplier: 1 },
+                
+                // Section 1: Basic Lemonade Business (1-8)
+                { baseIncome: 1, baseCost: 15, costMultiplier: 1.20 },
+                { baseIncome: 8, baseCost: 200, costMultiplier: 1.25 },
+                { baseIncome: 60, baseCost: 3500, costMultiplier: 1.30 },
+                { baseIncome: 500, baseCost: 75000, costMultiplier: 1.35 },
+                { baseIncome: 4500, baseCost: 1800000, costMultiplier: 1.40 },
+                { baseIncome: 45000, baseCost: 50000000, costMultiplier: 1.45 },
+                { baseIncome: 500000, baseCost: 1500000000, costMultiplier: 1.50 },
+                { baseIncome: 6000000, baseCost: 50000000000, costMultiplier: 1.55 },
+                
+                // Section 2: Alice in Wonderland + Lemon (9-16)
+                { baseIncome: 75000000, baseCost: 1500000000000, costMultiplier: 1.60 },
+                { baseIncome: 1000000000, baseCost: 50000000000000, costMultiplier: 1.62 },
+                { baseIncome: 15000000000, baseCost: 1800000000000000, costMultiplier: 1.64 },
+                { baseIncome: 250000000000, baseCost: 75000000000000000, costMultiplier: 1.66 },
+                { baseIncome: 4000000000000, baseCost: 3500000000000000000, costMultiplier: 1.68 },
+                { baseIncome: 65000000000000, baseCost: 175000000000000000000, costMultiplier: 1.70 },
+                { baseIncome: 1100000000000000, baseCost: 8750000000000000000000, costMultiplier: 1.72 },
+                { baseIncome: 18500000000000000, baseCost: 437500000000000000000000, costMultiplier: 1.74 },
+                
+                // Section 3: Age of Exploration + Lemon (17-24)
+                { baseIncome: 320000000000000000, baseCost: 21875000000000000000000000, costMultiplier: 1.76 },
+                { baseIncome: 5600000000000000000, baseCost: 1093750000000000000000000000, costMultiplier: 1.78 },
+                { baseIncome: 100000000000000000000, baseCost: 54687500000000000000000000000, costMultiplier: 1.80 },
+                { baseIncome: 1800000000000000000000, baseCost: 2734375000000000000000000000000, costMultiplier: 1.82 },
+                { baseIncome: 33000000000000000000000, baseCost: 136718750000000000000000000000000, costMultiplier: 1.84 },
+                { baseIncome: 610000000000000000000000, baseCost: 6835937500000000000000000000000000, costMultiplier: 1.86 },
+                { baseIncome: 11400000000000000000000000, baseCost: 341796875000000000000000000000000000, costMultiplier: 1.88 },
+                { baseIncome: 215000000000000000000000000, baseCost: 17089843750000000000000000000000000000, costMultiplier: 1.90 },
+                
+                // Section 4: Touhou Project + Lemon (25-32)
+                { baseIncome: 4100000000000000000000000000, baseCost: 854492187500000000000000000000000000000, costMultiplier: 1.92 },
+                { baseIncome: 78000000000000000000000000000, baseCost: 42724609375000000000000000000000000000000, costMultiplier: 1.94 },
+                { baseIncome: 1500000000000000000000000000000, baseCost: 2136230468750000000000000000000000000000000, costMultiplier: 1.96 },
+                { baseIncome: 29000000000000000000000000000000, baseCost: 106811523437500000000000000000000000000000000, costMultiplier: 1.98 },
+                { baseIncome: 560000000000000000000000000000000, baseCost: 5340576171875000000000000000000000000000000000, costMultiplier: 2.00 },
+                { baseIncome: 11000000000000000000000000000000000, baseCost: 267028808593750000000000000000000000000000000000, costMultiplier: 2.02 },
+                { baseIncome: 210000000000000000000000000000000000, baseCost: 13351440429687500000000000000000000000000000000000, costMultiplier: 2.04 },
+                { baseIncome: 4100000000000000000000000000000000000, baseCost: 667572021484375000000000000000000000000000000000000, costMultiplier: 2.06 },
+                
+                // Section 5: DND + Lemon (33-40)
+                { baseIncome: 79000000000000000000000000000000000000, baseCost: 33378601074218750000000000000000000000000000000000000, costMultiplier: 2.08 },
+                { baseIncome: 1540000000000000000000000000000000000000, baseCost: 1668930053710937500000000000000000000000000000000000000, costMultiplier: 2.10 },
+                { baseIncome: 30200000000000000000000000000000000000000, baseCost: 83446502685546875000000000000000000000000000000000000000, costMultiplier: 2.12 },
+                { baseIncome: 595000000000000000000000000000000000000000, baseCost: 4172325134277343750000000000000000000000000000000000000000, costMultiplier: 2.14 },
+                { baseIncome: 11800000000000000000000000000000000000000000, baseCost: 208616256713671875000000000000000000000000000000000000000000, costMultiplier: 2.16 },
+                { baseIncome: 234000000000000000000000000000000000000000000, baseCost: 10430812835683593750000000000000000000000000000000000000000000, costMultiplier: 2.18 },
+                { baseIncome: 4670000000000000000000000000000000000000000000, baseCost: 521540641784179687500000000000000000000000000000000000000000000, costMultiplier: 2.20 },
+                { baseIncome: 93400000000000000000000000000000000000000000000, baseCost: 26077032089208984375000000000000000000000000000000000000000000000, costMultiplier: 2.22 },
+                
+                // Section 6: Industrial Revolution + Lemon (41-48)
+                { baseIncome: 1880000000000000000000000000000000000000000000000, baseCost: 1303851604460449218750000000000000000000000000000000000000000000000, costMultiplier: 2.24 },
+                { baseIncome: 38000000000000000000000000000000000000000000000000, baseCost: 65192580223022460937500000000000000000000000000000000000000000000000, costMultiplier: 2.26 },
+                { baseIncome: 770000000000000000000000000000000000000000000000000, baseCost: 3259629011151123046875000000000000000000000000000000000000000000000000, costMultiplier: 2.28 },
+                { baseIncome: 15600000000000000000000000000000000000000000000000000, baseCost: 162981450557556152343750000000000000000000000000000000000000000000000000, costMultiplier: 2.30 },
+                { baseIncome: 318000000000000000000000000000000000000000000000000000, baseCost: 8149072527877807617187500000000000000000000000000000000000000000000000000, costMultiplier: 2.32 },
+                { baseIncome: 6500000000000000000000000000000000000000000000000000000, baseCost: 407453626393890380859375000000000000000000000000000000000000000000000000000, costMultiplier: 2.34 },
+                { baseIncome: 133000000000000000000000000000000000000000000000000000000, baseCost: 20372681319694519042968750000000000000000000000000000000000000000000000000000, costMultiplier: 2.36 },
+                { baseIncome: 2720000000000000000000000000000000000000000000000000000000, baseCost: 1018634065984725952148437500000000000000000000000000000000000000000000000000000, costMultiplier: 2.38 },
+                
+                // Section 7: SCP Foundation + Lemon (49-56)
+                { baseIncome: 55800000000000000000000000000000000000000000000000000000000, baseCost: 50931703299236297607421875000000000000000000000000000000000000000000000000000000, costMultiplier: 2.40 },
+                { baseIncome: 1150000000000000000000000000000000000000000000000000000000000, baseCost: 2546585164961814880371093750000000000000000000000000000000000000000000000000000000, costMultiplier: 2.42 },
+                { baseIncome: 23700000000000000000000000000000000000000000000000000000000000, baseCost: 127329258248090744018554687500000000000000000000000000000000000000000000000000000000, costMultiplier: 2.44 },
+                { baseIncome: 489000000000000000000000000000000000000000000000000000000000000, baseCost: 6366462912404537200927734375000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.46 },
+                { baseIncome: 10100000000000000000000000000000000000000000000000000000000000000, baseCost: 318323145620226860046386718750000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.48 },
+                { baseIncome: 209000000000000000000000000000000000000000000000000000000000000000, baseCost: 15916157281011343002319335937500000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.50 },
+                { baseIncome: 4330000000000000000000000000000000000000000000000000000000000000000, baseCost: 795807864050567150115966796875000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.52 },
+                { baseIncome: 89900000000000000000000000000000000000000000000000000000000000000000, baseCost: 39790393202528357505798339843750000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.54 },
+                
+                // Section 8: Primitive Era + Lemon (57-64)
+                { baseIncome: 1870000000000000000000000000000000000000000000000000000000000000000000, baseCost: 1989519660126417875289916992187500000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.56 },
+                { baseIncome: 38900000000000000000000000000000000000000000000000000000000000000000000, baseCost: 99475983006320893764495849609375000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.58 },
+                { baseIncome: 811000000000000000000000000000000000000000000000000000000000000000000000, baseCost: 4973799150316044688224792480468750000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.60 },
+                { baseIncome: 16900000000000000000000000000000000000000000000000000000000000000000000000, baseCost: 248689957515802234411239624023437500000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.62 },
+                { baseIncome: 353000000000000000000000000000000000000000000000000000000000000000000000000, baseCost: 12434497875790111720561981201171875000000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.64 },
+                { baseIncome: 7380000000000000000000000000000000000000000000000000000000000000000000000000, baseCost: 621724893789505586028099060058593750000000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.66 },
+                { baseIncome: 154000000000000000000000000000000000000000000000000000000000000000000000000000, baseCost: 31086244689475279301404953002929687500000000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.68 },
+                { baseIncome: 3220000000000000000000000000000000000000000000000000000000000000000000000000000, baseCost: 1554312234473763965070247650146484375000000000000000000000000000000000000000000000000000000000000000000000, costMultiplier: 2.70 }
+            ],
+            
+            buildingSections: [
+                {
+                    name: { en: "Basic Lemonade Business", zh: "基础柠檬生意" },
+                    description: { en: "Your humble lemonade empire begins here", zh: "你的柠檬帝国从这里开始" },
+                    range: [1, 8]
+                },
+                {
+                    name: { en: "Alice's Wonderland", zh: "爱丽丝仙境" },
+                    description: { en: "A quantum portal spilled lemonade into Wonderland's tea parties", zh: "量子门户将柠檬水溅入了仙境的茶会" },
+                    range: [9, 16]
+                },
+                {
+                    name: { en: "Age of Exploration", zh: "大航海时代" },
+                    description: { en: "Columbus brought citrus seeds to prevent scurvy, now we harvest empires", zh: "哥伦布为防坏血病带来柑橘种子，如今我们收获帝国" },
+                    range: [17, 24]
+                },
+                {
+                    name: { en: "Gensokyo Citrus Co.", zh: "幻想乡柑橘株式会社" },
+                    description: { en: "Yukari opened gaps to sell lemonade across dimensions", zh: "紫开启隙间在各个次元贩卖柠檬水" },
+                    range: [25, 32]
+                },
+                {
+                    name: { en: "Dragons & Dungeons & Lemons", zh: "龙与地下城与柠檬" },
+                    description: { en: "Roll for initiative! Critical hit on citrus profits!", zh: "投掷先攻值！柑橘利润暴击！" },
+                    range: [33, 40]
+                },
+                {
+                    name: { en: "Industrial Lemon Revolution", zh: "柠檬工业革命" },
+                    description: { en: "Steam-powered progress meets citrus innovation", zh: "蒸汽动力的进步遇见柑橘创新" },
+                    range: [41, 48]
+                },
+                {
+                    name: { en: "SCP Foundation Citrus Division", zh: "SCP基金会柑橘部门" },
+                    description: { en: "Secure, Contain, Protect... and Profit from anomalous lemons", zh: "收容，控制，保护...从异常柠檬中获利" },
+                    range: [49, 56]
+                },
+                {
+                    name: { en: "Primitive Lemon Restart", zh: "原始柠檬重启" },
+                    description: { en: "Civilization collapsed, but lemons remain eternal", zh: "文明崩塌了，但柠檬永恒不变" },
+                    range: [57, 64]
+                }
+            ],
+            
+            aiPersonalities: {
+                aggressive: {
+                    thinkInterval: 1000, // Think every 1 second
+                    decisionDelay: 300,
+                    buyMostExpensive: true,
+                    threshold: 0.8,
+                    clickRate: 2.5 // clicks per second
+                },
+                balanced: {
+                    thinkInterval: 1500, // Think every 1.5 seconds
+                    decisionDelay: 500,
+                    buyMostExpensive: false,
+                    threshold: 0.6,
+                    clickRate: 1.8
+                },
+                greedy: {
+                    thinkInterval: 800, // Think every 0.8 seconds
+                    decisionDelay: 200,
+                    buyMostExpensive: false,
+                    threshold: 0.9,
+                    clickRate: 3.2
+                }
+            }
+        };
 
-## 🏗️ Building Sections / 建筑区域
+        // ===== GAME STATE =====
+        class GameState {
+            constructor() {
+                this.player = {
+                    money: 10,
+                    buildings: new Array(gameConfig.buildings.length).fill(0)
+                };
+                
+                this.ai = {
+                    money: 9, // 90% of player start
+                    buildings: new Array(gameConfig.buildings.length).fill(0),
+                    personality: 'aggressive'
+                };
+                
+                this.buildingPurchases = new Array(gameConfig.buildings.length).fill(0); // Global purchase count for cost calculation
+                this.roundDuration = 10;
+                this.timeLeft = 10;
+                this.isPaused = false;
+                this.aiThinkTimer = null;
+            }
+            
+            getCurrentCost(buildingIndex) {
+                const config = gameConfig.buildings[buildingIndex];
+                return Math.floor(config.baseCost * Math.pow(config.costMultiplier, this.buildingPurchases[buildingIndex]));
+            }
+            
+            getIncome(isPlayer) {
+                const buildings = isPlayer ? this.player.buildings : this.ai.buildings;
+                let income = 0;
+                for (let i = 1; i < buildings.length; i++) {
+                    income += buildings[i] * gameConfig.buildings[i].baseIncome;
+                }
+                return income;
+            }
+            
+            canAfford(cost, isPlayer) {
+                const money = isPlayer ? this.player.money : this.ai.money;
+                return money >= cost;
+            }
+            
+            buyBuilding(buildingIndex, isPlayer) {
+                const cost = this.getCurrentCost(buildingIndex);
+                const entity = isPlayer ? this.player : this.ai;
+                
+                if (!this.canAfford(cost, isPlayer)) return false;
+                
+                // Start game if player makes their first action
+                if (isPlayer) {
+                    startGame();
+                }
+                
+                entity.money -= cost;
+                entity.buildings[buildingIndex]++;
+                this.buildingPurchases[buildingIndex]++;
+                
+                updateDisplay();
+                showPurchaseEffect(buildingIndex, isPlayer);
+                
+                return true;
+            }
+            
+            // Stagflation check: if next buy time > 365 days (including clicking)
+            checkStagflation(isPlayer) {
+                const entity = isPlayer ? this.player : this.ai;
+                const buildingIncome = this.getIncome(isPlayer);
+                const clickIncome = 10; // Both sides can click 10 times per second
+                const totalIncome = buildingIncome + clickIncome;
+                
+                // Find cheapest building
+                let cheapestCost = Infinity;
+                for (let i = 1; i < gameConfig.buildings.length; i++) {
+                    const cost = this.getCurrentCost(i);
+                    if (cost < cheapestCost) {
+                        cheapestCost = cost;
+                    }
+                }
+                
+                // Can afford now = not stagflation
+                if (entity.money >= cheapestCost) return false;
+                
+                // Calculate time to afford cheapest building (including clicking)
+                const needed = cheapestCost - entity.money;
+                const timeSeconds = needed / totalIncome;
+                const timeDays = timeSeconds / (24 * 3600);
+                
+                // If it takes more than 365 days, it's stagflation
+                return timeDays > 365;
+            }
+            
+            replaceAI() {
+                // Calculate player's total assets for reference
+                const playerAssets = calculateAssetValue(true);
+                const newBuildings = new Array(gameConfig.buildings.length).fill(0);
+                
+                // Find cheapest building available
+                let cheapestCost = Infinity;
+                let cheapestIndex = 1;
+                for (let i = 1; i < gameConfig.buildings.length; i++) {
+                    const cost = this.getCurrentCost(i);
+                    if (cost < cheapestCost) {
+                        cheapestCost = cost;
+                        cheapestIndex = i;
+                    }
+                }
+                
+                // Give AI buildings based on player's pattern but much more conservatively
+                let totalValue = 0;
+                const playerBuildings = this.player.buildings.slice();
+                
+                for (let i = 1; i < playerBuildings.length && i < gameConfig.buildings.length; i++) {
+                    if (playerBuildings[i] > 0) {
+                        // Give AI only 40-60% of player's buildings for this type (reduced from 70-90%)
+                        const giveAmount = Math.floor(playerBuildings[i] * (0.4 + Math.random() * 0.2));
+                        if (giveAmount > 0) {
+                            newBuildings[i] = giveAmount;
+                            totalValue += this.getCurrentCost(i) * giveAmount;
+                        }
+                    }
+                }
+                
+                // Calculate income the new AI will have
+                let newIncome = 0;
+                for (let i = 1; i < newBuildings.length; i++) {
+                    newIncome += newBuildings[i] * gameConfig.buildings[i].baseIncome;
+                }
+                
+                // Ensure AI can buy cheapest building within 1-2 minutes (more time = less aggressive)
+                const targetIncome = newIncome + 5; // Reduced clicking assumption
+                const timeToAfford = Math.max(0, cheapestCost / targetIncome);
+                
+                let bonusMoney = 0;
+                if (timeToAfford > 120) { // Increased to 2 minutes
+                    bonusMoney = cheapestCost - (targetIncome * 120); // Give enough for 2 minutes max
+                }
+                
+                // Much more conservative money allocation
+                const baseMoneyRatio = Math.min(0.05, 100 / playerAssets); // Max 5% of building value or proportional to player assets
+                
+                this.ai = {
+                    money: Math.floor(totalValue * baseMoneyRatio) + bonusMoney + 50, // Reduced from 10% and 100 base
+                    buildings: newBuildings,
+                    personality: Object.keys(gameConfig.aiPersonalities)[Math.floor(Math.random() * 3)]
+                };
+                
+                // Restart AI with new personality
+                stopAITimers();
+                startAIThinking();
+                startAIClicking();
+                
+                updateDisplay();
+                showMessage(t('aiReplaced'), 'info');
+            }
+        }
 
-1. **Basic Lemonade Business / 基础柠檬生意** - Your humble empire begins
-2. **Alice's Wonderland / 爱丽丝仙境** - Quantum portals meet tea parties
-3. **Age of Exploration / 大航海时代** - Citrus trade across the seas
-4. **Gensokyo Citrus Co. / 幻想乡柑橘株式会社** - Dimensional lemonade sales
-5. **Dragons & Dungeons & Lemons / 龙与地下城与柠檬** - Fantasy meets citrus profits
-6. **Industrial Lemon Revolution / 柠檬工业革命** - Steam-powered progress
-7. **SCP Foundation Citrus Division / SCP基金会柑橘部门** - Anomalous lemon containment
-8. **Primitive Lemon Restart / 原始柠檬重启** - Civilization collapses, lemons remain
+        // ===== GAME INSTANCE =====
+        let game = new GameState();
+        let gameTimer = null;
+        let bulkPurchaseQuantity = 1; // Current bulk purchase amount
+        let gameStarted = false; // Track if player has started the game
+        let pendingPurchases = new Set(); // Prevent race conditions in purchases
+        let playerStagflationAlerted = false; // Track if player stagflation has been alerted
+        
+        // ===== BGM SYSTEM =====
+        let bgmEnabled = false;
+        let bgmAudio = null;
+        let bgmUserDisabled = false; // Track if user manually disabled BGM
+        
+        function initializeBGM() {
+            bgmAudio = document.getElementById('bgmAudio');
+            bgmAudio.volume = 0.3; // Set volume to 30%
+            
+            // BGM error handling
+            bgmAudio.addEventListener('error', () => {
+                console.log('BGM file not found or failed to load');
+                updateBGMButton(false);
+            });
+            
+            // BGM can play event
+            bgmAudio.addEventListener('canplay', () => {
+                console.log('BGM loaded successfully');
+            });
+        }
+        
+        function toggleBGM() {
+            bgmEnabled = !bgmEnabled;
+            
+            if (bgmEnabled) {
+                playBGM();
+            } else {
+                pauseBGM();
+                bgmUserDisabled = true; // Remember user disabled it
+            }
+            
+            updateBGMButton(bgmEnabled);
+        }
+        
+        function autoStartBGM() {
+            // Only auto-start if user hasn't manually disabled it
+            if (!bgmUserDisabled) {
+                bgmEnabled = true;
+                playBGM();
+                updateBGMButton(bgmEnabled);
+            }
+        }
+        
+        function playBGM() {
+            if (bgmAudio) {
+                bgmAudio.play().catch(error => {
+                    console.log('BGM autoplay prevented by browser:', error);
+                    bgmEnabled = false;
+                    updateBGMButton(false);
+                });
+            }
+        }
+        
+        function pauseBGM() {
+            if (bgmAudio) {
+                bgmAudio.pause();
+            }
+        }
+        
+        function updateBGMButton(isPlaying) {
+            const btn = document.getElementById('bgmBtn');
+            const icon = isPlaying ? '🔊' : '🔇';
+            const bgClass = isPlaying ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600';
+            
+            btn.innerHTML = `${icon} <span id="bgmText">BGM</span>`;
+            btn.className = `px-4 py-2 ${bgClass} text-white rounded font-medium select-none`;
+        }
+        
+        // ===== TIME TRACKING =====
+        let realTimeStart = null; // When the game actually started
+        let gameTimeElapsed = 0; // Total game time in game time units
+        let lastUpdateTime = null;
+        
+        // Time dilation: game time advances based on selected round duration
+        // If round duration is 1h, then 10 seconds real time = 1h game time
+        // So 1 second real time = 0.1h = 6 minutes game time
+        function getGameTimeAdvanceRate() {
+            // Game time advances at rate: roundDuration / 10 seconds
+            return game.roundDuration / 10; // game time units per real second
+        }
+        
+        // ===== NUMBER FORMATTING =====
+        function formatNumber(num) {
+            if (num < 1000) return Math.floor(num).toString();
+            if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+            
+            // Use scientific notation for larger numbers
+            const exponent = Math.floor(Math.log10(num));
+            const mantissa = num / Math.pow(10, exponent);
+            return mantissa.toFixed(3) + 'E+' + exponent;
+        }
+        
+        // ===== ASSET VALUE CALCULATION =====
+        function calculateAssetValue(isPlayer) {
+            const buildings = isPlayer ? game.player.buildings : game.ai.buildings;
+            const money = isPlayer ? game.player.money : game.ai.money;
+            let totalValue = money;
+            
+            // Add up all building values at current market price
+            for (let i = 1; i < buildings.length; i++) {
+                if (buildings[i] > 0) {
+                    const currentPrice = game.getCurrentCost(i);
+                    totalValue += buildings[i] * currentPrice;
+                }
+            }
+            
+            return totalValue;
+        }
 
-## 🎵 Music / 音乐
+        // ===== UI FUNCTIONS =====
+        function updateDisplay() {
+            // Update money and income with scientific notation
+            document.getElementById('playerMoney').textContent = formatNumber(game.player.money);
+            document.getElementById('aiMoney').textContent = formatNumber(game.ai.money);
+            document.getElementById('playerIncome').textContent = formatNumber(game.getIncome(true));
+            document.getElementById('aiIncome').textContent = formatNumber(game.getIncome(false));
+            
+            // Update asset values
+            document.getElementById('playerAssets').textContent = formatNumber(calculateAssetValue(true));
+            document.getElementById('aiAssets').textContent = formatNumber(calculateAssetValue(false));
+            
+            // Update inflation countdown
+            document.getElementById('playerCountdown').textContent = calculateInflationCountdown(true);
+            document.getElementById('aiCountdown').textContent = calculateInflationCountdown(false);
+            
+            // Update AI info with stagflation stamp
+            const aiInfo = gameConfig.aiPersonalities[game.ai.personality];
+            const aiStagflation = game.checkStagflation(false);
+            const playerStagflation = game.checkStagflation(true);
+            
+            const aiNameText = t(`aiPersonalities.${game.ai.personality}.name`);
+            const playerNameText = "You";
+            
+            // Show AI stagflation with countdown
+            let aiDisplayName = aiNameText;
+            if (aiStagflation) {
+                if (aiStagflationCountdown > 0) {
+                    aiDisplayName = `${aiNameText} [STAGFLATION - ${aiStagflationCountdown.toFixed(1)}s]`;
+                } else {
+                    aiDisplayName = `${aiNameText} [STAGFLATION]`;
+                }
+            }
+            
+            document.getElementById('aiName').textContent = aiDisplayName;
+            document.getElementById('playerName').textContent = playerStagflation ? `${playerNameText} [STAGFLATION]` : playerNameText;
+            document.getElementById('aiPersonality').textContent = t(`aiPersonalities.${game.ai.personality}.description`);
+            
+            // Update buildings market
+            updateBuildingsMarket();
+            updateBuildingsDisplay();
+            
+            // Update time scale selector when new sections unlock
+            updateTimeScaleSelector();
+        }
+        
+        function checkSectionUnlocked(sectionIndex) {
+            const section = gameConfig.buildingSections[sectionIndex];
+            
+            // Check if any building in this section has been purchased
+            for (let i = section.range[0]; i <= section.range[1] && i < game.buildingPurchases.length; i++) {
+                if (game.buildingPurchases[i] > 0) {
+                    return true; // Keep unlocked if any building was purchased
+                }
+            }
+            
+            // Otherwise, check if either player or AI can afford the first building
+            const firstBuildingIndex = section.range[0];
+            const firstBuildingCost = game.getCurrentCost(firstBuildingIndex);
+            return game.canAfford(firstBuildingCost, true) || game.canAfford(firstBuildingCost, false);
+        }
+        
+        function updateBuildingsMarket() {
+            const market = document.getElementById('buildingsMarket');
+            market.innerHTML = '';
+            
+            // Group buildings by sections
+            gameConfig.buildingSections.forEach((section, sectionIndex) => {
+                const isUnlocked = checkSectionUnlocked(sectionIndex);
+                
+                if (!isUnlocked) return; // Skip locked sections
+                
+                // Create section header
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'mb-6';
+                
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = 'bg-gray-100 dark:bg-gray-700 rounded-lg p-3 mb-3 border-l-4 border-primary';
+                // Calculate stagflation threshold for this section (different for each era)
+                const stagflationDays = getStagflationThreshold(sectionIndex);
+                
+                sectionHeader.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-bold text-primary">${section.name[currentLang]}</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">${section.description[currentLang]}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs font-mono bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
+                                <div class="text-amber-700 dark:text-amber-300">Stagflation: ${stagflationDays} days</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                sectionDiv.appendChild(sectionHeader);
+                
+                // Create buildings grid for this section
+                const buildingsGrid = document.createElement('div');
+                buildingsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3';
+                
+                // Add buildings in this section
+                for (let i = section.range[0]; i <= section.range[1] && i < gameConfig.buildings.length; i++) {
+                    const singleCost = game.getCurrentCost(i);
+                    const config = gameConfig.buildings[i];
+                    const canAffordSingle = game.canAfford(singleCost, true);
+                    
+                    // Calculate how many we can actually afford for bulk purchase
+                    let actualQuantity = 0;
+                    let actualCost = 0;
+                    
+                    if (canAffordSingle) {
+                        for (let j = 1; j <= bulkPurchaseQuantity; j++) {
+                            const costForThisOne = calculateBulkCost(i, j);
+                            if (game.canAfford(costForThisOne, true)) {
+                                actualQuantity = j;
+                                actualCost = costForThisOne;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                    
+                    const displayQuantity = actualQuantity > 0 ? actualQuantity : bulkPurchaseQuantity;
+                    const displayCost = actualQuantity > 0 ? actualCost : (bulkPurchaseQuantity === 1 ? singleCost : calculateBulkCost(i, bulkPurchaseQuantity));
+                    const costLabel = displayQuantity === 1 ? '' : ` (×${displayQuantity})`;
+                    
+                    const buildingDiv = document.createElement('div');
+                    buildingDiv.className = `bg-white dark:bg-gray-800 rounded-lg p-3 border-2 transition-colors ${
+                        canAffordSingle ? 'border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 cursor-pointer' : 
+                        'border-gray-300 dark:border-gray-600 opacity-60'
+                    }`;
+                    
+                    buildingDiv.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-base font-bold mb-1">${t('buildings')[i]}</div>
+                            <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">+${formatNumber(config.baseIncome * displayQuantity)}G/s${costLabel}</div>
+                            <div class="text-base font-bold ${canAffordSingle ? 'text-green-600' : 'text-red-600'}">
+                                💰 ${formatNumber(displayCost)}G
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                Purchased: ${game.buildingPurchases[i]} times
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (canAffordSingle) {
+                        buildingDiv.addEventListener('click', () => {
+                            if (actualQuantity === 1) {
+                                game.buyBuilding(i, true);
+                            } else {
+                                buyBuildingBulk(i, actualQuantity, true);
+                            }
+                        });
+                    }
+                    
+                    buildingsGrid.appendChild(buildingDiv);
+                }
+                
+                sectionDiv.appendChild(buildingsGrid);
+                market.appendChild(sectionDiv);
+            });
+        }
+        
+        function updateBuildingsDisplay() {
+            updateEntityBuildings('playerBuildingsDisplay', game.player.buildings);
+            updateEntityBuildings('aiBuildingsDisplay', game.ai.buildings);
+        }
+        
+        function updateEntityBuildings(containerId, buildings) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            for (let i = 1; i < buildings.length; i++) {
+                const count = buildings[i];
+                if (count === 0) continue;
+                
+                const config = gameConfig.buildings[i];
+                const dps = count * config.baseIncome;
+                const buildingName = t('buildings')[i];
+                const emoji = buildingName.split(' ')[0]; // Extract emoji part
+                
+                const buildingDiv = document.createElement('div');
+                buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
+                buildingDiv.innerHTML = `
+                    <div class="flex flex-col items-center text-xs leading-tight">
+                        <span class="text-sm">${emoji}</span>
+                        <div class="font-bold text-primary text-xs">${count}</div>
+                        <div class="text-gray-500 dark:text-gray-400 text-xs">${formatNumber(dps)}/s</div>
+                    </div>
+                `;
+                container.appendChild(buildingDiv);
+            }
+        }
+        
+        function showPurchaseEffect(buildingIndex, isPlayer, quantity = 1) {
+            const quantityText = quantity > 1 ? ` ×${quantity}` : '';
+            const message = `${isPlayer ? '👤' : '🤖'} bought ${t('buildings')[buildingIndex]}${quantityText}!`;
+            showMessage(message, isPlayer ? 'success' : 'warning');
+        }
+        
+        function showMessage(text, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `px-4 py-2 rounded-lg text-white font-medium shadow-lg transform transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' :
+                type === 'warning' ? 'bg-yellow-500' :
+                type === 'error' ? 'bg-red-500' : 'bg-blue-500'
+            }`;
+            messageDiv.textContent = text;
+            
+            document.getElementById('statusMessages').appendChild(messageDiv);
+            
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateX(100%)';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 3000);
+        }
 
-The game features the background track **"Snowy Blade March" / "雪中悍刀行"**, created using Suno AI.
+        // ===== AI LOGIC =====
+        let aiThinkTimer = null;
+        let aiClickTimer = null;
+        
+        function aiThink() {
+            if (game.isPaused || !gameStarted) return;
+            
+            const personality = gameConfig.aiPersonalities[game.ai.personality];
+            
+            // AI decision logic
+            setTimeout(() => {
+                if (game.isPaused || !gameStarted) return;
+                
+                let bestChoice = -1;
+                let bestValue = 0;
+                
+                for (let i = 1; i < gameConfig.buildings.length; i++) {
+                    const cost = game.getCurrentCost(i);
+                    if (!game.canAfford(cost, false)) continue;
+                    
+                    const config = gameConfig.buildings[i];
+                    const efficiency = config.baseIncome / cost;
+                    
+                    if (personality.buyMostExpensive) {
+                        if (cost > bestValue) {
+                            bestChoice = i;
+                            bestValue = cost;
+                        }
+                    } else {
+                        if (efficiency > bestValue) {
+                            bestChoice = i;
+                            bestValue = efficiency;
+                        }
+                    }
+                }
+                
+                if (bestChoice !== -1 && Math.random() < personality.threshold) {
+                    // Add 0.5 second delay and anti-race condition for AI purchases
+                    attemptAIPurchase(bestChoice);
+                }
+            }, personality.decisionDelay);
+        }
+        
+        function attemptAIPurchase(buildingIndex) {
+            if (pendingPurchases.has(buildingIndex)) return; // Prevent race condition
+            
+            pendingPurchases.add(buildingIndex);
+            
+            const purchaseTime = Date.now() + 500; // Target purchase time
+            
+            function executePurchase() {
+                if (!gameStarted) {
+                    pendingPurchases.delete(buildingIndex);
+                    return;
+                }
+                
+                if (game.isPaused) {
+                    // If paused, wait and try again later
+                    setTimeout(executePurchase, 100);
+                    return;
+                }
+                
+                // Double-check the building is still affordable (price might have changed)
+                const cost = game.getCurrentCost(buildingIndex);
+                if (game.canAfford(cost, false)) {
+                    game.buyBuilding(buildingIndex, false);
+                }
+                
+                pendingPurchases.delete(buildingIndex);
+            }
+            
+            setTimeout(executePurchase, 500); // 0.5 second delay
+        }
+        
+        function startAIThinking() {
+            if (aiThinkTimer) clearInterval(aiThinkTimer);
+            
+            const personality = gameConfig.aiPersonalities[game.ai.personality];
+            aiThinkTimer = setInterval(() => {
+                if (!game.isPaused) {
+                    aiThink();
+                }
+            }, personality.thinkInterval);
+        }
+        
+        function aiClick() {
+            if (game.isPaused) return;
+            
+            game.ai.money += 1;
+            // No message to avoid spam
+            updateDisplay();
+        }
+        
+        function startAIClicking() {
+            if (aiClickTimer) clearInterval(aiClickTimer);
+            
+            const personality = gameConfig.aiPersonalities[game.ai.personality];
+            const clickInterval = 1000 / personality.clickRate; // Convert clicks per second to milliseconds
+            
+            aiClickTimer = setInterval(() => {
+                if (!game.isPaused) {
+                    aiClick();
+                }
+            }, clickInterval);
+        }
+        
+        function stopAITimers() {
+            if (aiThinkTimer) clearInterval(aiThinkTimer);
+            if (aiClickTimer) clearInterval(aiClickTimer);
+        }
 
-游戏配备背景音乐**《雪中悍刀行》/ "Snowy Blade March"**，使用Suno AI创作。
+        // ===== STAGFLATION COUNTDOWN TRACKING =====
+        let aiStagflationTimer = null;
+        let aiStagflationCountdown = 0;
+        
+        function startAIStagflationCountdown() {
+            aiStagflationCountdown = 10; // 10 seconds countdown
+            
+            if (aiStagflationTimer) clearInterval(aiStagflationTimer);
+            aiStagflationTimer = setInterval(() => {
+                aiStagflationCountdown -= 0.1;
+                if (aiStagflationCountdown <= 0) {
+                    clearInterval(aiStagflationTimer);
+                    aiStagflationTimer = null;
+                    aiStagflationCountdown = 0;
+                }
+            }, 100);
+        }
+        
+        function stopAIStagflationCountdown() {
+            if (aiStagflationTimer) {
+                clearInterval(aiStagflationTimer);
+                aiStagflationTimer = null;
+                aiStagflationCountdown = 0;
+            }
+        }
 
-**⚠️ Important Music License Notice / 音乐许可重要声明：**
+        // ===== GAME LOOP =====
+        function gameLoop() {
+            if (game.isPaused) {
+                updateTimeDisplay(); // Still update time display when paused
+                return;
+            }
+            
+            // Update game time tracking
+            const now = Date.now();
+            if (lastUpdateTime) {
+                const realTimeDelta = (now - lastUpdateTime) / 1000;
+                gameTimeElapsed += realTimeDelta;
+            }
+            lastUpdateTime = now;
+            
+            // Update timer (always 10 seconds countdown, regardless of selected duration)
+            game.timeLeft -= 0.1;
+            document.getElementById('timer').textContent = `${game.timeLeft.toFixed(1)}s`;
+            
+            // Update time displays
+            updateTimeDisplay();
+            
+            // Real-time stagflation detection (every tick)
+            checkRealTimeStagflation();
+            
+            if (game.timeLeft <= 0) {
+                processRound();
+            }
+        }
+        
+        function checkRealTimeStagflation() {
+            // Check AI stagflation every tick
+            if (game.checkStagflation(false)) {
+                if (aiStagflationTimer === null) { // Only start countdown if not already started
+                    showMessage(t('stagflation') + ' (AI) - replacing in 10s', 'warning');
+                    startAIStagflationCountdown();
+                    setTimeout(() => {
+                        if (game.checkStagflation(false)) { // Double check before replacing
+                            game.replaceAI();
+                            stopAIStagflationCountdown();
+                        }
+                    }, 10000);
+                }
+            } else {
+                // AI is no longer in stagflation, stop countdown
+                stopAIStagflationCountdown();
+            }
+            
+            // Check player stagflation every tick, but only alert once
+            if (game.checkStagflation(true)) {
+                if (!playerStagflationAlerted) {
+                    playerStagflationAlerted = true;
+                    showMessage(t('stagflation') + ' (Player) - you are locked!', 'error');
+                }
+            } else {
+                // Player is no longer in stagflation, reset alert flag
+                playerStagflationAlerted = false;
+            }
+        }
+        
+        function processRound() {
+            // Add income
+            game.player.money += game.getIncome(true) * game.roundDuration;
+            game.ai.money += game.getIncome(false) * game.roundDuration;
+            
+            // AI bulk buying after income
+            aiBuyAllAffordable();
+            
+            // Check stagflation - AI gets replaced, Player just gets locked
+            if (game.checkStagflation(false)) {
+                if (aiStagflationTimer === null) { // Only start countdown if not already started
+                    showMessage(t('stagflation') + ' (AI) - replacing in 10s', 'warning');
+                    startAIStagflationCountdown();
+                    setTimeout(() => {
+                        if (game.checkStagflation(false)) { // Double check before replacing
+                            game.replaceAI();
+                            stopAIStagflationCountdown();
+                        }
+                    }, 10000);
+                }
+            } else {
+                // AI is no longer in stagflation, stop countdown
+                stopAIStagflationCountdown();
+            }
+            
+            if (game.checkStagflation(true)) {
+                showMessage(t('stagflation') + ' (Player) - you are locked!', 'error');
+            }
+            
+            // Reset timer (always 10 seconds, not the selected duration)
+            game.timeLeft = 10;
+            
+            // AI thinks at round start
+            aiThink();
+            
+            updateDisplay();
+        }
+        
+        function aiBuyAllAffordable() {
+            if (game.isPaused) return;
+            
+            let purchasesMade = 0;
+            let canContinue = true;
+            
+            // Keep buying until AI can't afford anything
+            while (canContinue && purchasesMade < 100) { // Safety limit
+                canContinue = false;
+                
+                for (let i = 1; i < gameConfig.buildings.length; i++) {
+                    const cost = game.getCurrentCost(i);
+                    if (game.canAfford(cost, false)) {
+                        game.buyBuilding(i, false);
+                        purchasesMade++;
+                        canContinue = true;
+                        break; // Check from the beginning again
+                    }
+                }
+            }
+            
+            if (purchasesMade > 0) {
+                showMessage(`🤖 bought ${purchasesMade} buildings!`, 'warning');
+            }
+        }
+        
+        function startGameLoop() {
+            if (gameTimer) clearInterval(gameTimer);
+            gameTimer = setInterval(gameLoop, 100);
+        }
 
-**English:** The included music track has **NO LICENSE** for redistribution. If you fork this project, you **MUST** replace the music file (`bgm.mp3`) with your own music. The music is provided only for this specific game instance and cannot be redistributed, modified, or used in derivative works.
+        // ===== BULK PURCHASE FUNCTIONS =====
+        function setBulkPurchaseQuantity(quantity) {
+            bulkPurchaseQuantity = quantity;
+            
+            // Update button states
+            ['bulkBtn1', 'bulkBtn10', 'bulkBtn25', 'bulkBtn100'].forEach(id => {
+                const btn = document.getElementById(id);
+                const btnQuantity = parseInt(id.replace('bulkBtn', ''));
+                
+                if (btnQuantity === quantity) {
+                    btn.className = 'px-3 py-1 bg-primary hover:bg-primary/80 text-white rounded text-sm font-medium select-none';
+                } else {
+                    btn.className = 'px-3 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded text-sm font-medium select-none';
+                }
+            });
+            
+            updateDisplay();
+        }
+        
+        function calculateBulkCost(buildingIndex, quantity) {
+            let totalCost = 0;
+            const config = gameConfig.buildings[buildingIndex];
+            
+            for (let i = 0; i < quantity; i++) {
+                const currentCount = game.buildingPurchases[buildingIndex] + i;
+                const cost = Math.floor(config.baseCost * Math.pow(config.costMultiplier, currentCount));
+                totalCost += cost;
+            }
+            
+            return totalCost;
+        }
+        
+        function buyBuildingBulk(buildingIndex, quantity, isPlayer) {
+            const totalCost = calculateBulkCost(buildingIndex, quantity);
+            const entity = isPlayer ? game.player : game.ai;
+            
+            if (!game.canAfford(totalCost, isPlayer)) return false;
+            
+            entity.money -= totalCost;
+            entity.buildings[buildingIndex] += quantity;
+            game.buildingPurchases[buildingIndex] += quantity;
+            
+            updateDisplay();
+            showPurchaseEffect(buildingIndex, isPlayer, quantity);
+            
+            return true;
+        }
 
-**中文：** 包含的音乐曲目**没有重发布许可**。如果你分叉(fork)这个项目，你**必须**用自己的音乐替换音乐文件(`bgm.mp3`)。音乐仅为这个特定游戏实例提供，不能重新分发、修改或用于衍生作品。
+        // ===== RESTART GAME FUNCTION =====
+        function restartGame() {
+            // Stop all timers
+            stopAITimers();
+            if (gameTimer) clearInterval(gameTimer);
+            
+            // Reset game state
+            game = new GameState();
+            gameStarted = false;
+            pendingPurchases.clear();
+            bulkPurchaseQuantity = 1;
+            
+            // Reset time tracking
+            realTimeStart = null;
+            gameTimeElapsed = 0;
+            lastUpdateTime = null;
+            
+            // Reset UI
+            setBulkPurchaseQuantity(1);
+            updateDisplay();
+            
+            // Reset time display
+            document.getElementById('realTime').textContent = '0:00';
+            document.getElementById('gameTime').textContent = '0:00';
+            
+            // Don't start game loop, wait for player to start the game
+            
+            showMessage(t('gameRestart'), 'info');
+        }
+        
+        function easyStartGame() {
+            // Stop all timers
+            stopAITimers();
+            if (gameTimer) clearInterval(gameTimer);
+            
+            // Reset game state
+            game = new GameState();
+            // Give player head start, but AI keeps normal start (no sustained advantage)
+            game.player.money = 1000;
+            game.ai.money = 9; // AI keeps normal start - player must still work to maintain advantage
+            
+            // Give AI some Scout Helpers so countdown isn't ∞
+            game.ai.buildings[1] = 10; // 10 Scout Helpers for AI
+            game.buildingPurchases[1] = 10; // Update global purchase count
+            
+            gameStarted = false;
+            pendingPurchases.clear();
+            bulkPurchaseQuantity = 1;
+            
+            // Reset time tracking
+            realTimeStart = null;
+            gameTimeElapsed = 0;
+            lastUpdateTime = null;
+            
+            // Reset UI
+            setBulkPurchaseQuantity(1);
+            updateDisplay();
+            
+            // Reset time display
+            document.getElementById('realTime').textContent = '0:00';
+            document.getElementById('gameTime').textContent = '0:00';
+            
+            // Don't start game loop, wait for player to start the game
+            
+            showMessage(t('easyStart') + ' - ' + t('gameRestart'), 'info');
+        }
+        
+        function startGame() {
+            if (!gameStarted) {
+                gameStarted = true;
+                realTimeStart = Date.now();
+                lastUpdateTime = Date.now();
+                startGameLoop(); // Start the game loop when player acts
+                startAIThinking();
+                startAIClicking();
+                autoStartBGM(); // Auto-start BGM when game begins
+                showMessage('Game started! AI is now active.', 'success');
+            }
+        }
+        
+        // ===== TIME FORMATTING =====
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
+            
+            if (hours > 0) {
+                return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            } else {
+                return `${minutes}:${secs.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        // ===== TIME SCALE SYSTEM =====
+        function getAvailableTimeScales() {
+            // Base scales always available
+            let scales = [
+                { value: 10, label: "10s", units: "seconds" },
+                { value: 15, label: "15s", units: "seconds" },
+                { value: 30, label: "30s", units: "seconds" },
+                { value: 60, label: "1min", units: "minutes" },
+                { value: 120, label: "2min", units: "minutes" },
+                { value: 300, label: "5min", units: "minutes" },
+                { value: 600, label: "10min", units: "minutes" },
+                { value: 1800, label: "30min", units: "minutes" },
+                { value: 3600, label: "1h", units: "hours" }
+            ];
+            
+            // Check unlock progress for larger scales
+            const highestSectionUnlocked = getHighestUnlockedSection();
+            
+            if (highestSectionUnlocked >= 0) { // Basic section unlocked
+                scales.push(
+                    { value: 86400, label: "1d", units: "days" },
+                    { value: 86400 * 7, label: "1w", units: "days" },
+                    { value: 86400 * 30, label: "1mo", units: "days" },
+                    { value: 86400 * 365, label: "1y", units: "years" }
+                );
+            }
+            
+            if (highestSectionUnlocked >= 1) { // Wonderland unlocked
+                scales.push(
+                    { value: 86400 * 365 * 10, label: "1dec", units: "years" },
+                    { value: 86400 * 365 * 100, label: "1cent", units: "centuries" }
+                );
+            }
+            
+            if (highestSectionUnlocked >= 2) { // Age of Exploration unlocked
+                scales.push(
+                    { value: 86400 * 365 * 1000, label: "1mill", units: "millennia" },
+                    { value: 86400 * 365 * 10000, label: "1era", units: "eras" }
+                );
+            }
+            
+            if (highestSectionUnlocked >= 3) { // Gensokyo unlocked - cosmic scales
+                for (let exp = 5; exp <= 20; exp++) {
+                    const years = Math.pow(10, exp);
+                    scales.push({
+                        value: 86400 * 365 * years,
+                        label: `1E+${exp}y`,
+                        units: "cosmic"
+                    });
+                }
+            }
+            
+            return scales;
+        }
+        
+        function getHighestUnlockedSection() {
+            for (let i = gameConfig.buildingSections.length - 1; i >= 0; i--) {
+                if (checkSectionUnlocked(i)) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        
+        function updateTimeScaleSelector() {
+            const selector = document.getElementById('roundDuration');
+            const currentValue = game.roundDuration;
+            const availableScales = getAvailableTimeScales();
+            
+            selector.innerHTML = '';
+            availableScales.forEach(scale => {
+                const option = document.createElement('option');
+                option.value = scale.value;
+                option.textContent = scale.label;
+                if (scale.value === currentValue) {
+                    option.selected = true;
+                }
+                selector.appendChild(option);
+            });
+        }
+        
+        function formatGameTime(gameTimeInSeconds) {
+            // Convert real seconds to game time based on current round duration
+            const gameTimeRate = getGameTimeAdvanceRate(); // game time units per real second
+            const totalGameTime = gameTimeInSeconds * gameTimeRate; // in selected time units
+            
+            // Format based on scale
+            if (game.roundDuration < 3600) { // seconds/minutes
+                return formatTime(totalGameTime);
+            } else if (game.roundDuration < 86400) { // hours  
+                const hours = Math.floor(totalGameTime / 3600);
+                const mins = Math.floor((totalGameTime % 3600) / 60);
+                return `${hours}h ${mins}m`;
+            } else if (game.roundDuration < 86400 * 365) { // days
+                const days = Math.floor(totalGameTime / 86400);
+                const hours = Math.floor((totalGameTime % 86400) / 3600);
+                return `${days}d ${hours}h`;
+            } else if (game.roundDuration < 86400 * 365 * 100) { // years
+                const years = Math.floor(totalGameTime / (86400 * 365));
+                const days = Math.floor((totalGameTime % (86400 * 365)) / 86400);
+                return `${years}y ${days}d`;
+            } else if (game.roundDuration < 86400 * 365 * 10000) { // centuries
+                const centuries = Math.floor(totalGameTime / (86400 * 365 * 100));
+                const years = Math.floor((totalGameTime % (86400 * 365 * 100)) / (86400 * 365));
+                return `${centuries}c ${years}y`;
+            } else { // eras and beyond
+                const eras = Math.floor(totalGameTime / (86400 * 365 * 10000));
+                const centuries = Math.floor((totalGameTime % (86400 * 365 * 10000)) / (86400 * 365 * 100));
+                if (eras < 1000) {
+                    return `${eras}era ${centuries}c`;
+                } else {
+                    // Scientific notation for very large values
+                    const exponent = Math.floor(Math.log10(eras));
+                    const mantissa = eras / Math.pow(10, exponent);
+                    return `${mantissa.toFixed(2)}E+${exponent} eras`;
+                }
+            }
+        }
+        
+        function getTimeScaleText() {
+            const rate = getGameTimeAdvanceRate();
+            if (rate < 60) {
+                return `1 real second = ${rate.toFixed(1)} game seconds`;
+            } else if (rate < 3600) {
+                return `1 real second = ${(rate/60).toFixed(1)} game minutes`;
+            } else if (rate < 86400) {
+                return `1 real second = ${(rate/3600).toFixed(1)} game hours`;
+            } else if (rate < 86400 * 365) {
+                return `1 real second = ${(rate/86400).toFixed(1)} game days`;
+            } else if (rate < 86400 * 365 * 100) {
+                return `1 real second = ${(rate/(86400 * 365)).toFixed(1)} game years`;
+            } else {
+                const centuries = rate / (86400 * 365 * 100);
+                if (centuries < 1000) {
+                    return `1 real second = ${centuries.toFixed(1)} game centuries`;
+                } else {
+                    const exponent = Math.floor(Math.log10(centuries));
+                    const mantissa = centuries / Math.pow(10, exponent);
+                    return `1 real second = ${mantissa.toFixed(2)}E+${exponent} game centuries`;
+                }
+            }
+        }
+        
+        function updateTimeDisplay() {
+            if (!gameStarted || !realTimeStart) return;
+            
+            const now = Date.now();
+            const realTimeSeconds = (now - realTimeStart) / 1000;
+            
+            document.getElementById('realTime').textContent = formatTime(realTimeSeconds);
+            document.getElementById('gameTime').textContent = formatGameTime(gameTimeElapsed);
+        }
 
-## 📄 License / 许可证
+        // ===== EVENT LISTENERS =====
+        document.getElementById('manualClickBtn').addEventListener('click', () => {
+            startGame(); // Start the game on first click
+            game.player.money += 1;
+            updateDisplay();
+        });
+        
+        // Bulk purchase buttons
+        document.getElementById('bulkBtn1').addEventListener('click', () => setBulkPurchaseQuantity(1));
+        document.getElementById('bulkBtn10').addEventListener('click', () => setBulkPurchaseQuantity(10));
+        document.getElementById('bulkBtn25').addEventListener('click', () => setBulkPurchaseQuantity(25));
+        document.getElementById('bulkBtn100').addEventListener('click', () => setBulkPurchaseQuantity(100));
+        
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            game.isPaused = !game.isPaused;
+            const btn = document.getElementById('pauseBtn');
+            
+            if (game.isPaused) {
+                btn.textContent = t('resume');
+                btn.className = btn.className.replace('bg-yellow-500 hover:bg-yellow-600', 'bg-green-500 hover:bg-green-600');
+            } else {
+                btn.textContent = t('pause');
+                btn.className = btn.className.replace('bg-green-500 hover:bg-green-600', 'bg-yellow-500 hover:bg-yellow-600');
+                aiThink(); // AI thinks immediately when unpaused
+            }
+        });
+        
+        document.getElementById('fastForwardBtn').addEventListener('click', () => {
+            if (!game.isPaused) {
+                const fastForwardTime = game.timeLeft; // Real time being skipped
+                gameTimeElapsed += fastForwardTime; // Add skipped time to game time (with time dilation)
+                game.timeLeft = 0; // Trigger immediate round processing
+            }
+        });
+        
+        document.getElementById('roundDuration').addEventListener('change', (e) => {
+            game.roundDuration = parseInt(e.target.value);
+            game.timeLeft = 10; // Always 10 seconds countdown
+            document.getElementById('timeScaleText').textContent = getTimeScaleText();
+        });
+        
+        document.getElementById('languageSelect').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            updateLanguage();
+        });
+        
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            restartGame();
+        });
+        
+        document.getElementById('easyStartBtn').addEventListener('click', () => {
+            easyStartGame();
+        });
+        
+        document.getElementById('bgmBtn').addEventListener('click', () => {
+            toggleBGM();
+        });
 
-**Game Code / 游戏代码:** This project is licensed under the GNU General Public License v3.0 (GPL-3.0). You are free to use, modify, and distribute the game code under the terms of this license.
+        // ===== LANGUAGE UPDATE =====
+        function updateLanguage() {
+            // Update static text
+            document.getElementById('manualClickBtn').textContent = t('manualClick');
+            
+            const pauseBtn = document.getElementById('pauseBtn');
+            pauseBtn.textContent = game.isPaused ? t('resume') : t('pause');
+            
+            document.getElementById('fastForwardBtn').textContent = t('fastForward');
+            document.getElementById('easyStartBtn').textContent = t('easyStart');
+            
+            // Update display to refresh all dynamic text
+            updateDisplay();
+        }
 
-**Music / 音乐:** The music file is **NOT** licensed for redistribution. See the music notice above.
+        // ===== DARK MODE =====
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
 
-**游戏代码：** 本项目采用GNU通用公共许可证v3.0 (GPL-3.0)。你可以根据此许可证条款自由使用、修改和分发游戏代码。
+        // ===== STAGFLATION THRESHOLDS =====
+        function getStagflationThreshold(sectionIndex) {
+            // Different eras have different stagflation thresholds
+            const thresholds = [
+                365,      // Section 0: Basic Lemonade Business
+                1000,     // Section 1: Alice's Wonderland  
+                5000,     // Section 2: Age of Exploration
+                10000,    // Section 3: Gensokyo Citrus Co.
+                50000,    // Section 4: Dragons & Dungeons & Lemons
+                250000,   // Section 5: Industrial Lemon Revolution
+                1000000,  // Section 6: SCP Foundation Citrus Division
+                5000000   // Section 7: Primitive Lemon Restart
+            ];
+            return thresholds[sectionIndex] || 365;
+        }
 
-**音乐：** 音乐文件**不**允许重新分发。请参阅上述音乐声明。
+        // ===== INFLATION COUNTDOWN =====
+        function calculateInflationCountdown(isPlayer) {
+            const entity = isPlayer ? game.player : game.ai;
+            const income = game.getIncome(isPlayer);
+            
+            if (income <= 0) return "∞"; // No income, can never afford
+            
+            // Find cheapest building
+            let cheapestCost = Infinity;
+            for (let i = 1; i < gameConfig.buildings.length; i++) {
+                const cost = game.getCurrentCost(i);
+                if (cost < cheapestCost) {
+                    cheapestCost = cost;
+                }
+            }
+            
+            if (entity.money >= cheapestCost) return "Now";
+            
+            const needed = cheapestCost - entity.money;
+            const timeSeconds = needed / income;
+            
+            // Use long time format for next buy countdown
+            return formatLongTime(timeSeconds);
+        }
+        
+        function formatLongTime(timeSeconds) {
+            if (timeSeconds < 60) return `${timeSeconds.toFixed(1)}s`;
+            if (timeSeconds < 3600) return `${(timeSeconds / 60).toFixed(1)}m`;
+            if (timeSeconds < 86400) return `${(timeSeconds / 3600).toFixed(1)}h`;
+            if (timeSeconds < 86400 * 365) return `${(timeSeconds / 86400).toFixed(1)}d`;
+            if (timeSeconds < 86400 * 365 * 100) return `${(timeSeconds / (86400 * 365)).toFixed(1)}y`;
+            if (timeSeconds < 86400 * 365 * 10000) return `${(timeSeconds / (86400 * 365 * 100)).toFixed(1)}c`;
+            
+            const eras = timeSeconds / (86400 * 365 * 10000);
+            if (eras < 1000) {
+                return `${eras.toFixed(1)}era`;
+            } else {
+                const exponent = Math.floor(Math.log10(eras));
+                const mantissa = eras / Math.pow(10, exponent);
+                return `${mantissa.toFixed(2)}E+${exponent}era`;
+            }
+        }
 
-## 🚀 Getting Started / 开始游戏
-
-1. Download or clone this repository / 下载或克隆此仓库
-2. Place your own `bgm.mp3` file in the same directory (if forking) / 在同目录放置你自己的`bgm.mp3`文件（如果分叉项目）
-3. Open `index.html` in a modern web browser / 在现代浏览器中打开`index.html`
-4. Click "🍋 Squeeze Lemon" to start the game / 点击"🍋 榨柠檬"开始游戏
-5. Compete against AI and build your lemon empire! / 与AI竞争，建立你的柠檬帝国！
-
-## 🎯 Game Features / 游戏特色
-
-- **🌍 Bilingual Support** - Full Chinese and English localization / 完整中英文本地化
-- **🎨 Dark Mode** - Automatic theme detection / 自动主题检测
-- **📱 Mobile Friendly** - Responsive design for all devices / 适配所有设备的响应式设计
-- **🔊 Optional BGM** - Auto-starts but remembers user preference / 自动开始但记住用户偏好
-- **⏰ Time Acceleration** - From seconds to cosmic time scales / 从秒到宇宙时间尺度
-- **🤖 Smart AI** - Multiple personalities with different strategies / 多种性格的智能AI策略
-- **📊 Real-time Economics** - Live stagflation detection and market dynamics / 实时滞胀检测和市场动态
-
-## 🔧 Technical Requirements / 技术要求
-
-- Modern web browser with JavaScript enabled / 支持JavaScript的现代浏览器
-- No server required - runs entirely client-side / 无需服务器 - 完全客户端运行
-- Audio support for BGM (optional) / 音频支持BGM（可选）
-
-## 🤝 Contributing / 贡献
-
-Contributions are welcome! Please ensure any pull requests:
-- Follow the GPL-3.0 license terms
-- Do not include copyrighted music files
-- Maintain bilingual documentation
-
-欢迎贡献！请确保任何拉取请求：
-- 遵循GPL-3.0许可条款
-- 不包含有版权的音乐文件
-- 维护双语文档
-
----
-
-**Enjoy building your lemon empire! / 享受建设你的柠檬帝国！** 🍋👑
+        // ===== INITIALIZE GAME =====
+        function initializeGame() {
+            // Set language selector to detected language
+            document.getElementById('languageSelect').value = currentLang;
+            
+            updateTimeScaleSelector();
+            updateDisplay();
+            document.getElementById('timeScaleText').textContent = getTimeScaleText();
+            
+            // Apply initial language to UI
+            updateLanguage();
+        }
+        
+        // Initialize when page loads
+        initializeGame();
+        initializeBGM();
+        // Game loop and AI will start when player makes first action
+    </script>
+</body>
+</html>
