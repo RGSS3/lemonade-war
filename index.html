@@ -171,7 +171,7 @@
                 </div>
 
                 <!-- Manual Click Button and Bulk Purchase Controls -->
-                <div class="text-center mb-4">
+                <div class="text-center mb-2">
                     <div class="flex flex-wrap items-center justify-center gap-3">
                         <button id="manualClickBtn" class="px-6 py-3 bg-primary hover:bg-primary/80 text-white rounded-lg font-bold text-lg transition-transform active:scale-95 select-none">
                             🍋 <span id="clickText">Squeeze Lemon (+1G)</span>
@@ -1050,26 +1050,50 @@
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             
+            // Count how many building types have units
+            const buildingTypes = [];
             for (let i = 1; i < buildings.length; i++) {
                 const count = buildings[i];
                 if (count === 0) continue;
-                
+                buildingTypes.push(i);
+            }
+            
+            const totalTypes = buildingTypes.length;
+            const isCompact = totalTypes > 10;
+            
+            buildingTypes.forEach((i, index) => {
+                const count = buildings[i];
                 const config = gameConfig.buildings[i];
                 const dps = count * config.baseIncome;
                 const buildingName = t('buildings')[i];
                 const emoji = buildingName.split(' ')[0]; // Extract emoji part
                 
+                // Show full info only for the last building when compact, or all buildings when not compact
+                const showFullInfo = !isCompact || index === totalTypes - 1;
+                
                 const buildingDiv = document.createElement('div');
-                buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
-                buildingDiv.innerHTML = `
-                    <div class="flex flex-col items-center text-xs leading-tight">
-                        <span class="text-sm">${emoji}</span>
-                        <div class="font-bold text-primary text-xs">${count}</div>
-                        <div class="text-gray-500 dark:text-gray-400 text-xs">${formatNumber(dps)}/s</div>
-                    </div>
-                `;
+                if (showFullInfo) {
+                    // Full display with DPS
+                    buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
+                    buildingDiv.innerHTML = `
+                        <div class="flex flex-col items-center text-xs leading-tight">
+                            <span class="text-sm">${emoji}</span>
+                            <div class="font-bold text-primary text-xs">${count}</div>
+                            <div class="text-gray-500 dark:text-gray-400 text-xs">${formatNumber(dps)}/s</div>
+                        </div>
+                    `;
+                } else {
+                    // Compact display - only emoji and count in one line
+                    buildingDiv.className = 'bg-white dark:bg-gray-700 rounded px-1 py-1 text-center border min-w-0 flex-shrink-0';
+                    buildingDiv.innerHTML = `
+                        <div class="flex items-center justify-center text-xs">
+                            <span class="text-sm mr-1">${emoji}</span>
+                            <div class="font-bold text-primary text-xs">${count}</div>
+                        </div>
+                    `;
+                }
                 container.appendChild(buildingDiv);
-            }
+            });
         }
         
         function showPurchaseEffect(buildingIndex, isPlayer, quantity = 1) {
