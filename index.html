@@ -23,15 +23,18 @@
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors select-none">
     <!-- Game Container -->
-    <div class="min-h-screen flex flex-col">
-        <!-- Header Controls -->
-        <div class="bg-gray-50 dark:bg-gray-800 p-4 shadow-md">
-            <div class="max-w-6xl mx-auto">
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-2">
-                    <h1 class="text-2xl font-bold text-primary">🍋 <span id="gameTitle">Lemonade Inflation Wars</span></h1>
-                    
-                    <!-- Control Buttons -->
-                    <div class="flex items-center gap-2 flex-wrap">
+    <div class="min-h-screen flex flex-col lg:flex-row lg:h-screen">
+        <!-- Header Controls / Left Sidebar -->
+        <div class="bg-gray-50 dark:bg-gray-800 p-4 shadow-md lg:w-80 lg:min-h-screen lg:shadow-lg">
+            <div class="lg:max-w-none max-w-6xl mx-auto lg:mx-0">
+                <!-- Title -->
+                <div class="mb-4">
+                    <h1 class="text-xl lg:text-2xl font-bold text-primary">🍋 <span id="gameTitle">Lemonade Inflation Wars</span></h1>
+                </div>
+                
+                <!-- Control Buttons -->
+                <div class="space-y-2 mb-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-1 gap-2">
                         <select id="roundDuration" class="px-3 py-1 rounded bg-white dark:bg-gray-700 border text-base select-none">
                             <!-- Options will be populated dynamically based on game progress -->
                         </select>
@@ -58,26 +61,28 @@
                     </div>
                 </div>
                 
-                <!-- Time Display Row -->
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-3">
-                        <div id="timer" class="px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded font-mono">
+                <!-- Time Display -->
+                <div class="space-y-3 mb-4">
+                    <div class="text-center">
+                        <div id="timer" class="inline-block px-3 py-1 bg-gray-200 dark:bg-gray-600 rounded font-mono text-lg font-bold">
                             10.0s
                         </div>
-                        
-                        <div class="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                        <div class="text-sm bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded text-center">
                             <div>Real: <span id="realTime" class="font-mono">0:00</span></div>
                             <div>Game: <span id="gameTime" class="font-mono">0d 0:00</span></div>
                         </div>
                         
                         <div class="text-xs bg-amber-100 dark:bg-amber-900/20 px-2 py-1 rounded">
-                            <div class="text-amber-700 dark:text-amber-300" id="timeScaleText">Time Scale: 1 real second = 1 game second</div>
+                            <div class="text-amber-700 dark:text-amber-300 text-center" id="timeScaleText">Time Scale: 1 real second = 1 game second</div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Language Selector on separate line -->
-                <div class="flex justify-end">
+                <!-- Language Selector -->
+                <div class="text-center">
                     <select id="languageSelect" class="px-3 py-1 rounded bg-white dark:bg-gray-700 border text-base">
                         <option value="en">English</option>
                         <option value="zh">中文</option>
@@ -87,7 +92,7 @@
         </div>
 
         <!-- Main Game Area -->
-        <div class="flex-1 max-w-6xl mx-auto w-full p-4">
+        <div class="flex-1 lg:flex-1 lg:overflow-y-auto lg:h-screen w-full p-4">
             <!-- AI Section (Top) -->
             <div class="bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
                 <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
