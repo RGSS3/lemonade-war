@@ -51,6 +51,10 @@
                         <button id="easyStartBtn" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded font-medium select-none">
                             🚀 <span id="easyStartText">Easy Start</span>
                         </button>
+                        
+                        <button id="bgmBtn" class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded font-medium select-none">
+                            🔇 <span id="bgmText">BGM</span>
+                        </button>
                     </div>
                 </div>
                 
@@ -182,6 +186,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- BGM Audio -->
+        <audio id="bgmAudio" loop preload="auto">
+            <source src="bgm.mp3" type="audio/mpeg">
+            <!-- Fallback message for browsers that don't support audio -->
+        </audio>
 
         <!-- Status Messages -->
         <div id="statusMessages" class="fixed bottom-4 right-4 space-y-2 z-50">
@@ -752,6 +762,74 @@
         let gameStarted = false; // Track if player has started the game
         let pendingPurchases = new Set(); // Prevent race conditions in purchases
         let playerStagflationAlerted = false; // Track if player stagflation has been alerted
+        
+        // ===== BGM SYSTEM =====
+        let bgmEnabled = false;
+        let bgmAudio = null;
+        let bgmUserDisabled = false; // Track if user manually disabled BGM
+        
+        function initializeBGM() {
+            bgmAudio = document.getElementById('bgmAudio');
+            bgmAudio.volume = 0.3; // Set volume to 30%
+            
+            // BGM error handling
+            bgmAudio.addEventListener('error', () => {
+                console.log('BGM file not found or failed to load');
+                updateBGMButton(false);
+            });
+            
+            // BGM can play event
+            bgmAudio.addEventListener('canplay', () => {
+                console.log('BGM loaded successfully');
+            });
+        }
+        
+        function toggleBGM() {
+            bgmEnabled = !bgmEnabled;
+            
+            if (bgmEnabled) {
+                playBGM();
+            } else {
+                pauseBGM();
+                bgmUserDisabled = true; // Remember user disabled it
+            }
+            
+            updateBGMButton(bgmEnabled);
+        }
+        
+        function autoStartBGM() {
+            // Only auto-start if user hasn't manually disabled it
+            if (!bgmUserDisabled) {
+                bgmEnabled = true;
+                playBGM();
+                updateBGMButton(bgmEnabled);
+            }
+        }
+        
+        function playBGM() {
+            if (bgmAudio) {
+                bgmAudio.play().catch(error => {
+                    console.log('BGM autoplay prevented by browser:', error);
+                    bgmEnabled = false;
+                    updateBGMButton(false);
+                });
+            }
+        }
+        
+        function pauseBGM() {
+            if (bgmAudio) {
+                bgmAudio.pause();
+            }
+        }
+        
+        function updateBGMButton(isPlaying) {
+            const btn = document.getElementById('bgmBtn');
+            const icon = isPlaying ? '🔊' : '🔇';
+            const bgClass = isPlaying ? 'bg-green-500 hover:bg-green-600' : 'bg-gray-500 hover:bg-gray-600';
+            
+            btn.innerHTML = `${icon} <span id="bgmText">BGM</span>`;
+            btn.className = `px-4 py-2 ${bgClass} text-white rounded font-medium select-none`;
+        }
         
         // ===== TIME TRACKING =====
         let realTimeStart = null; // When the game actually started
@@ -1403,6 +1481,7 @@
                 startGameLoop(); // Start the game loop when player acts
                 startAIThinking();
                 startAIClicking();
+                autoStartBGM(); // Auto-start BGM when game begins
                 showMessage('Game started! AI is now active.', 'success');
             }
         }
@@ -1626,6 +1705,10 @@
         document.getElementById('easyStartBtn').addEventListener('click', () => {
             easyStartGame();
         });
+        
+        document.getElementById('bgmBtn').addEventListener('click', () => {
+            toggleBGM();
+        });
 
         // ===== LANGUAGE UPDATE =====
         function updateLanguage() {
@@ -1728,6 +1811,7 @@
         
         // Initialize when page loads
         initializeGame();
+        initializeBGM();
         // Game loop and AI will start when player makes first action
     </script>
 </body>
